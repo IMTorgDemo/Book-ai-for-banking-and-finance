@@ -4,6 +4,11 @@
 logs/
 tests/demo_mod/
 
+# JupyterBook
+mynewbook/
+_build/
+notebooks/archive/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
