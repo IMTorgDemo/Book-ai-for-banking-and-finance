@@ -1,5 +1,7 @@
 # AI for Banking and Finance
 
+This uses conda environments not typical pipenv vms.
+
 ## TOC
 
 _DS Tools_
