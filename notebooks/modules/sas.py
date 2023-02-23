@@ -17,7 +17,7 @@ from dask.delayed import delayed
 
 
 
-def dask_sas_reader(dir_or_file_path, chunksize):
+def dask_sas_reader(path, blocksize):
     """Read SAS file(s) into Dask DataFrame
 
     * solution proposed in [github issue](https://github.com/dask/dask/issues/1233)
@@ -50,7 +50,7 @@ def dask_sas_reader(dir_or_file_path, chunksize):
     
     def read_sas_chunk(offset):
         #reads a chunk of the sas file
-        df, _ = pyreadstat.read_sas7bdat(filepath, disable_datetime_conversion=True, row_offset=offset, row_limit=chunksize)
+        df, _ = pyreadstat.read_sas7bdat(filepath, disable_datetime_conversion=True, row_offset=offset, row_limit=blocksize)
         return df
     
     def get_list_of_sas_file_chunks(filepath, chunksize):
@@ -66,23 +66,34 @@ def dask_sas_reader(dir_or_file_path, chunksize):
     
 
     #workflow
-    dir_or_file_path = Path(dir_or_file_path)
-    check1 = dir_or_file_path.is_file()
-    check2 = dir_or_file_path.is_dir()
+    if hasattr(path, "name"):
+        path = str(path)
+    path = Path(path)
+    check1 = path.is_file()
+    check2 = path.is_dir()
+    check3 = path.parent.is_dir()
+    dfs = []
 
     if check1:
-        filepath = dir_or_file_path.resolve().__str__()
-        dfs = get_list_of_sas_file_chunks(filepath, chunksize)
+        filepath = path.resolve().__str__()
+        dfs_lst = get_list_of_sas_file_chunks(filepath, blocksize)
+        dfs.extend(dfs_lst)
     elif check2:
-        dirpath_files = dir_or_file_path.glob('**/*')
+        dirpath_files = path.glob('**/*')
         sas_files = [file for file in dirpath_files if is_sas_file(file)]
-        dfs = []
         for file in sas_files:
             filepath = file.resolve().__str__()
-            dfs_lst = get_list_of_sas_file_chunks(filepath, chunksize)
+            dfs_lst = get_list_of_sas_file_chunks(filepath, blocksize)
             dfs.extend(dfs_lst)
+    elif check3:
+        dirpath_files = path.parent.glob('**/'+path.stem)
+        sas_files = [file for file in dirpath_files if is_sas_file(file)]
+        for file in sas_files:
+            filepath = file.resolve().__str__()
+            dfs_lst = get_list_of_sas_file_chunks(filepath, blocksize)
+            dfs.extend(dfs_lst)        
     else:
-        print(f'ERROR: `{ str(dir_or_file_path.resolve()) }` is not a sas file or directory of sas files')
+        print(f'ERROR: `{ str(path.resolve()) }` is not a sas file or directory of sas files')
 
     ddf = dd.from_delayed(dfs)
     return ddf
