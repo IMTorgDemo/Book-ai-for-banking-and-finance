@@ -46,6 +46,10 @@ _Theory and Mathematics_
 
 ## Install and Build
 
+Start the environment with: `source activate base`.
+
+After adding packages, use: `pip list --format=freeze > requirements.txt`
+
 
 ### Review Book theme
 

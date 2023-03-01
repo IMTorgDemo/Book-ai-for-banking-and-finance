@@ -1,0 +1,8 @@
+
+
+
+## Python Performance Improvements
+
+* vectorization - numpy
+* ufunc - numpy
+* out-of-memory processing - dask
