@@ -36,6 +36,7 @@ _Data and Domains_
 
 * Financial data
   - SEC
+  - CFTC
 
 
 _Theory and Mathematics_
@@ -46,9 +47,12 @@ _Theory and Mathematics_
 
 ## Install and Build
 
-Start the environment with: `source activate base`.
+This project is focused on conda venv (pip may not work):
 
-After adding packages, use: `pip list --format=freeze > requirements.txt`
+* create a conda virtual environment with: `conda create --name base --file requirements.txt`
+* start the environment with: `source activate base`
+* use in conda env by: `conda list -e > requirements.txt`
+* use in pip env by: `pip list --format=freeze > requirements.txt`
 
 
 ### Review Book theme
